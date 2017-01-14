@@ -24,7 +24,7 @@ import (
 
 // CmdCi runs ci loop
 func CmdCi(c *cli.Context) error {
-	defer CmdTeardown(c)
+  defer cleanup(c)
 
 	logrus.Info("Running bootstrap")
 	if err := CmdBootstrap(c); err != nil {
@@ -57,4 +57,9 @@ func CmdCi(c *cli.Context) error {
 		logrus.Info("No publish service defined, and no Dockerfile present.")
 		return nil
 	}
+}
+
+func cleanup(c *cli.Context) {
+  helpers.DumpContainerLogs()
+  CmdTeardown(c)
 }

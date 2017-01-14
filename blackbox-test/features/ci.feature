@@ -1,11 +1,11 @@
 # Copyright 2016 Cisco Systems, Inc.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -124,3 +124,42 @@ Feature: ci task
     And I run `lc ci --git-branch=origin/master`
     Then it should succeed
     And the output should contain "No publish service defined, and no Dockerfile present."
+
+  Scenario: dumping logs from linked services
+    Given a file named "docker-compose.yml" with:
+    """yaml
+    test:
+      image: busybox
+      command: /bin/true
+    package:
+      image: busybox
+      command: /bin/true
+    blackbox-test:
+      image: busybox
+      command: /bin/echo blackbox-test
+      links:
+        - service-foo
+        - service-bar
+    service-foo:
+      image: busybox
+      command: "/bin/echo foo && sleep 200"
+    service-bar:
+      image: busybox
+      command: "/bin/echo bar && sleep 200"
+    """
+    And a file named "Dockerfile" with:
+    """
+    FROM alpine
+    """
+    And a file named "lc.yml" with:
+    """yaml
+    docker_image_name: elsyblackbox_dumping_logs
+    docker_registry: localhost:5000
+    """
+    And I run `lc ci`
+    Then it should succeed
+    And the output should contain all of these:
+      | The push refers to a repository [localhost:5000/elsyblackbox_dumping_logs]|
+      | latest: digest: sha256                                                                             |       |
+    And the image 'elsyblackbox_dumping_logs' should exist
+    And
