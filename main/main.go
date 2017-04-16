@@ -33,8 +33,15 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			//logrus.Error(r)
+			os.Exit(1)
+		}
+	}()
+
 	if err := LoadConfigFile("lc.yml"); err != nil {
-		panic(err)
+		logrus.Panic(err)
 	}
 
 	app := cli.NewApp()
@@ -159,7 +166,7 @@ func setComposeTemplate(c *cli.Context) {
 			logrus.Debugf("setting LC_BASE_COMPOSE_FILE to %v", file)
 			os.Setenv("LC_BASE_COMPOSE_FILE", file)
 		} else {
-			logrus.Panicf("error finding template %q, err: %q", templateName, err)
+			logrus.Panicf("error finding template \"%s\": %s", templateName, err)
 		}
 
 		dataContainers := template.GetSharedExternalDataContainers(templateName)

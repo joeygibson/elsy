@@ -115,7 +115,7 @@ func GetTemplate(templateName string, enableScratchVolume bool, templateImage st
 func GetV1(name string, enableScratchVolume bool, templateImage string) (string, error) {
 	tmpl, present := templatesV1[name]
 	if !present {
-		return "", fmt.Errorf("template %q is not a registered v1 template", name)
+		return "", fmt.Errorf("template \"%s\" is not a registered v1 template", name)
 	}
 	yml, err := tmpl.toYml(enableScratchVolume, templateImage)
 	if err != nil {
@@ -130,7 +130,7 @@ func GetV1(name string, enableScratchVolume bool, templateImage string) (string,
 func GetV2(name string, enableScratchVolume bool, templateImage string) (string, error) {
 	tmpl, present := templatesV2[name]
 	if !present {
-		return "", fmt.Errorf("template %q is not a registered v2 template", name)
+		return "", fmt.Errorf("template \"%s\" is not a registered v2 template", name)
 	}
 	yml, err := tmpl.toYml(enableScratchVolume, templateImage)
 	if err != nil {
